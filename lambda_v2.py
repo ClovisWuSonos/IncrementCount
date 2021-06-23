@@ -19,7 +19,6 @@ def get_bucket_and_key(event):
         key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
     except Exception as e:
         print(e)
-
     return bucket, key
 
 
@@ -31,7 +30,6 @@ def extract_key(key):
 
 
 def lambda_handler(event, context):
-
     #bucket, key = get_bucket_and_key(event) 
     #test_framework, filetype, filename = extract_key(key)
     bucket = 'grafana-integration'  
@@ -61,7 +59,6 @@ def factory_helper(test_framework, filetype, input_bucket, input_key, output_buc
 
 
 def parse_junit_report(input_bucket, input_key, output_bucket, output_key):
-
     s3 = boto3.client('s3')
     parsed_xml = ''
     string = ''
