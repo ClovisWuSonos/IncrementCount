@@ -1,11 +1,9 @@
 # PRE-REQUISITE: if you need to run this script locally, install boto3 library on your machine
 # pip3 install boto3
 #
-# Description: this script fetches an input jUnit xml file from a S3 bucket, parse it into a log-formatted string, 
-# and upload the whole parsed string as a file to another S3 bucket. The parsed data contain testcase name, status(passed, 
-# failure, skipped), build_number, service_version etc. Some fields are currently not available in the input file.
-# A factory helper method is used to identify the test framework and file type of input file.
-# The two methods: get_bucket_and_key and extract_key will be used after adding SNS/S3 trigger.
+# Description: this script fetches an input jUnit xml file from a S3 bucket, parse it into a log-formatted string, and upload output to another S3 bucket. 
+# A factory helper method is used to identify the test framework and file type of input file. 
+# The two methods: get_bucket_and_key and extract_key will be used later after adding SNS/S3 trigger.
 import boto3
 import os
 import xml.etree.ElementTree as ET
@@ -87,6 +85,7 @@ def parse_junit_report(input_bucket, input_key, output_bucket, output_key):
                     failure_type = children[0].attrib["type"]
 
             ts = time.time()
+            # build number and service version is currently unavailable in the input file.
             line = "{} testcase={} classname={} time={} build_number={} service_version={} status={} message={} type={}\n".format(str(ts), element.attrib['name'], element.attrib['classname'], element.attrib['time'], 'na', 'na', test_status, message, failure_type)
             string += line #may need to optimize time complexity
 
