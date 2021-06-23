@@ -41,7 +41,6 @@ def lambda_handler(event, context):
     factory_helper(test_framework, filetype, bucket, key, output_bucket, output_key)
 
 
-
 def factory_helper(test_framework, filetype, input_bucket, input_key, output_bucket, output_key):
 
     if (filetype == 'xml'):
