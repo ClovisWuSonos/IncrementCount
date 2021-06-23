@@ -3,28 +3,12 @@
 #
 # Description: this script fetches an input jUnit xml file from a S3 bucket, parse it into a log-formatted string, and upload output to another S3 bucket. 
 # A factory helper method is used to identify the test framework and file type of input file. 
-# The two methods: get_bucket_and_key and extract_key will be used later after adding SNS/S3 trigger.
+# The last two methods: get_bucket_and_key and extract_key will be used later after adding SNS/S3 trigger.
 import boto3
 import os
 import xml.etree.ElementTree as ET
 import urllib
 import time
-
-
-def get_bucket_and_key(event):
-    try:
-        bucket = event['Records'][0]['s3']['bucket']['name']
-        key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
-    except Exception as e:
-        print(e)
-    return bucket, key
-
-
-def extract_key(key):
-    test_framework = ''
-    filetype = ''
-    filename = ''
-    return test_framework, filetype, filename
 
 
 def lambda_handler(event, context):
@@ -62,7 +46,8 @@ def parse_junit_report(input_bucket, input_key, output_bucket, output_key):
     string = ''
 
     try:
-        obj = s3.get_object(Bucket=input_bucket, Key=input_key) #fetch input file from S3 bucket
+        # Fetch input file from S3 bucket
+        obj = s3.get_object(Bucket=input_bucket, Key=input_key)
         file_data = obj['Body'].read() #.decode('utf-8')
         parsed_xml = ET.fromstring(file_data)
 
@@ -85,12 +70,28 @@ def parse_junit_report(input_bucket, input_key, output_bucket, output_key):
                     failure_type = children[0].attrib["type"]
 
             ts = time.time()
-            # build number and service version is currently unavailable in the input file.
+            # Build number and service version are currently unavailable in the input.
             line = "{} testcase={} classname={} time={} build_number={} service_version={} status={} message={} type={}\n".format(str(ts), element.attrib['name'], element.attrib['classname'], element.attrib['time'], 'na', 'na', test_status, message, failure_type)
             string += line #may need to optimize time complexity
 
-        #upload file to another S3 bucket.
+        # Upload file to another S3 bucket.
         s3.put_object(Bucket=output_bucket,Key=output_key, Body=string)
 
     except Exception as e:
         print(e)
+
+
+def get_bucket_and_key(event):
+    try:
+        bucket = event['Records'][0]['s3']['bucket']['name']
+        key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
+    except Exception as e:
+        print(e)
+    return bucket, key
+
+
+def extract_key(key):
+    test_framework = ''
+    filetype = ''
+    filename = ''
+    return test_framework, filetype, filename
