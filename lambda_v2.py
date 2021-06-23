@@ -2,7 +2,6 @@ import boto3
 import os
 import xml.etree.ElementTree as ET
 import urllib
-#import traceback
 
 
 def get_bucket_and_key(event):
@@ -16,14 +15,15 @@ def get_bucket_and_key(event):
 
 
 def extract_key(key):
+    test_framework = ''
+    filetype = ''
+    filename = ''
     return test_framework, filetype, filename
-
 
 
 def lambda_handler(event, context):
 
     #bucket, key = get_bucket_and_key(event) 
-
     #test_framework, filetype, filename = extract_key(key)
 
     bucket = 'clovisbucketone'
@@ -118,39 +118,4 @@ def parse_jUnit_report(input_bucket, input_key, output_bucket, output_key):
     except Exception as e:
         print(e)
     
-
-
-
-#input_bucket = 'clovisbucketone'
-#input_key = 'service-1/test-framework-1/input.xml'
-#output_bucket = 'clovisbucketzero'
-#output_key = 'output.log'
-
-
-#traceback.print_stack()
-#traceback.print_exc() 
-#traceback.print_exception(*sys.exc_info())
-"""
-#from xml.dom import minidom
-#s3.put_object(Bucket=bucket,Key="out.log", Body="test.log")
-
-string = ""
-with open("/tmp/data.log", "w") as out:
-    for child in parsed_xml: 
-        if (child.tag == "testcase"):
-            testcase = child.attrib['name']
-            classname = child.attrib['classname']
-            time = child.attrib['time']
-            build_number = 'na'
-            service_version = 'na'
-            status = 'na'
-            message = 'na'
-            failure_type = 'na'
-             
-            line = "testcase={} classname={} time={} build_number={} service_version={} status={} message={} type={} \n".format(testcase, classname, time, build_number, service_version, status, message, failure_type)
-            string += line
-            out.write(string)
-
-out.close()
-
 
